@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Detail Option Value",
+  "description": "An option value with availability signals relative to the current selections. Used in get_product responses where selected context exists.",
+  "type": "object",
+  "properties": {
+    "available": {
+      "type": "boolean",
+      "description": "Whether a variant matching this value and the current option selections is purchasable."
+    },
+    "exists": {
+      "type": "boolean",
+      "description": "Whether a variant matching this value and the current option selections exists in the catalog."
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "option_value.json"
+    }
+  ]
+}

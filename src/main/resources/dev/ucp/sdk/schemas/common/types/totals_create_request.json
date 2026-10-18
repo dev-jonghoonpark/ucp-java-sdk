@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Totals Create Request",
+  "description": "Pricing breakdown provided by the business. MUST contain exactly one subtotal and one total entry. Detail types (tax, fee, discount, fulfillment) may appear multiple times for itemization. Platforms MUST render all entries in order using display_text and amount.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {},
+    "allOf": [
+      {
+        "$ref": "total_create_request.json"
+      },
+      {
+        "if": {
+          "properties": {
+            "type": {
+              "not": {
+                "enum": [
+                  "subtotal",
+                  "items_discount",
+                  "discount",
+                  "fulfillment",
+                  "tax",
+                  "fee",
+                  "total"
+                ]
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        "then": {
+          "required": [
+            "display_text"
+          ]
+        }
+      }
+    ],
+    "required": []
+  },
+  "contains": {
+    "properties": {
+      "type": {
+        "const": "subtotal"
+      }
+    },
+    "required": [
+      "type"
+    ]
+  },
+  "minContains": 1,
+  "maxContains": 1
+}

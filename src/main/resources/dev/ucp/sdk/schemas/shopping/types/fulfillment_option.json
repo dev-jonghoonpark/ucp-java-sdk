@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fulfillment Option",
+  "description": "A fulfillment option within a group (e.g., Standard Shipping $5, Express $15). Extends the fulfillment option base with cost and timing.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "carrier": {
+      "type": "string",
+      "description": "Carrier name (for shipping).",
+      "ucp_request": "omit"
+    },
+    "earliest_fulfillment_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Earliest fulfillment date.",
+      "ucp_request": "omit"
+    },
+    "latest_fulfillment_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Latest fulfillment date.",
+      "ucp_request": "omit"
+    },
+    "totals": {
+      "type": "array",
+      "items": {
+        "$ref": "../../common/types/total.json"
+      },
+      "description": "Fulfillment option totals breakdown.",
+      "ucp_request": "omit"
+    }
+  },
+  "required": [
+    "totals"
+  ],
+  "allOf": [
+    {
+      "$ref": "fulfillment_option_base.json"
+    }
+  ]
+}

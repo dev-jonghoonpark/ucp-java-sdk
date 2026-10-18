@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Shipping Destination Update Request",
+  "description": "Shipping destination.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "ID specific to this shipping destination."
+    },
+    "type": {
+      "type": "string",
+      "const": "shipping_address",
+      "description": "Destination type discriminator."
+    }
+  },
+  "required": [],
+  "allOf": [
+    {
+      "$ref": "../../common/types/postal_address_update_request.json"
+    }
+  ]
+}

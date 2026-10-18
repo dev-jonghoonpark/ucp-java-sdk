@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Message Update Request",
+  "type": "object",
+  "description": "Container for error, warning, or info messages.",
+  "oneOf": [
+    {
+      "$ref": "message_error_update_request.json"
+    },
+    {
+      "$ref": "message_warning_update_request.json"
+    },
+    {
+      "$ref": "message_info_update_request.json"
+    }
+  ],
+  "properties": {},
+  "required": []
+}

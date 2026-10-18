@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Location Update Request",
+  "description": "The full, rich representation of a physical business location. Builds on the Location Summary schema with discovery-centric details such as geographic coordinates, operating hours, timezone, and amenities.",
+  "$defs": {
+    "amenity": {
+      "title": "Amenity",
+      "description": "Buyer-facing presentation metadata for one amenity identifier. The containing map key, not this metadata, defines amenity identity and filter matching.",
+      "type": "object",
+      "required": [
+        "description"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short, plain-text, buyer-facing label or phrase for the amenity, suitable for direct use in a compact list (e.g., 'Curbside pickup'). The Business SHOULD localize it for the request when possible. This content does not participate in amenity identity or filter matching.",
+          "ucp_request": "omit"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": true,
+  "if": {
+    "anyOf": [
+      {
+        "required": [
+          "hours"
+        ]
+      },
+      {
+        "required": [
+          "exception_hours"
+        ]
+      }
+    ]
+  },
+  "then": {
+    "required": [
+      "timezone"
+    ]
+  },
+  "properties": {},
+  "allOf": [
+    {
+      "$ref": "location_summary_update_request.json"
+    }
+  ],
+  "required": []
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Business Location Destination",
+  "description": "A business location fulfillment destination. Business-authored and response-only: the Platform selects a location via `selected_destination_id` rather than writing destinations.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "business_location",
+      "description": "Destination type discriminator. Response-only.",
+      "ucp_request": "omit"
+    }
+  },
+  "required": [
+    "type"
+  ],
+  "allOf": [
+    {
+      "$ref": "../../common/types/location_summary.json"
+    }
+  ]
+}

@@ -1,0 +1,710 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UCP Service",
+  "description": "Service declaration with one transport binding. Each transport binding is a separate entry in the service array; `version` identifies the service, not the transport.",
+  "$defs": {
+    "base": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "rest",
+            "mcp",
+            "a2a",
+            "embedded"
+          ],
+          "description": "Transport protocol for this service binding."
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint URL for this transport binding."
+        }
+      },
+      "required": [
+        "version",
+        "transport"
+      ]
+    },
+    "platform_schema": {
+      "title": "Service (Platform Schema)",
+      "description": "Full service declaration for platform-level discovery. All transports require `version`, `spec`, and `transport`. REST, MCP, and embedded additionally require `schema`.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "rest",
+            "mcp",
+            "a2a",
+            "embedded"
+          ],
+          "description": "Transport protocol for this service binding."
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint URL for this transport binding."
+        }
+      },
+      "required": [
+        "version",
+        "transport",
+        "spec"
+      ],
+      "anyOf": [
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "rest"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "spec",
+            "version",
+            "schema",
+            "transport"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "mcp"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "spec",
+            "version",
+            "schema",
+            "transport"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "a2a"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "spec",
+            "version",
+            "transport"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "embedded"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "spec",
+            "version",
+            "schema",
+            "transport"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "business_schema": {
+      "title": "Service (Business Schema)",
+      "description": "Service binding for business/merchant configuration. May override platform endpoints.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "rest",
+            "mcp",
+            "a2a",
+            "embedded"
+          ],
+          "description": "Transport protocol for this service binding."
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint URL for this transport binding."
+        }
+      },
+      "required": [
+        "version",
+        "transport"
+      ],
+      "anyOf": [
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "rest"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport",
+            "endpoint"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "mcp"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport",
+            "endpoint"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "a2a"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport",
+            "endpoint"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "$ref": "transports/embedded_config.json"
+            },
+            "transport": {
+              "const": "embedded"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "response_schema": {
+      "title": "Service (Response Schema)",
+      "description": "Service binding in API responses. Includes per-resource transport configuration via typed config.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "rest",
+            "mcp",
+            "a2a",
+            "embedded"
+          ],
+          "description": "Transport protocol for this service binding."
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Endpoint URL for this transport binding."
+        }
+      },
+      "required": [
+        "version",
+        "transport"
+      ],
+      "anyOf": [
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "rest"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "mcp"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "type": "object",
+              "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+              "additionalProperties": true
+            },
+            "transport": {
+              "const": "a2a"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "description": "Entity version in YYYY-MM-DD format."
+            },
+            "spec": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to human-readable specification document."
+            },
+            "schema": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL to JSON Schema defining this entity's structure and payloads."
+            },
+            "id": {
+              "type": "string",
+              "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+            },
+            "config": {
+              "$ref": "transports/embedded_config.json"
+            },
+            "transport": {
+              "const": "embedded"
+            },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Endpoint URL for this transport binding."
+            }
+          },
+          "required": [
+            "version",
+            "transport"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  }
+}

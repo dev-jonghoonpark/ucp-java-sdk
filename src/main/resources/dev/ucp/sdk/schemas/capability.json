@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UCP Capability",
+  "description": "Schema for UCP capabilities and extensions. Extensions are capabilities with an 'extends' field. Uses reverse-domain naming for governance.",
+  "$defs": {
+    "base": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "extends": {
+          "oneOf": [
+            {
+              "$ref": "common/types/reverse_domain_name.json"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "common/types/reverse_domain_name.json"
+              },
+              "minItems": 1
+            }
+          ],
+          "description": "Parent capability(s) this extends. Present for extensions, absent for root capabilities. Use array for multi-parent extensions."
+        }
+      },
+      "required": [
+        "version"
+      ]
+    },
+    "platform_schema": {
+      "title": "Capability (Platform Schema)",
+      "description": "Full capability declaration for platform-level discovery. Includes spec/schema URLs for agent fetching.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "extends": {
+          "oneOf": [
+            {
+              "$ref": "common/types/reverse_domain_name.json"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "common/types/reverse_domain_name.json"
+              },
+              "minItems": 1
+            }
+          ],
+          "description": "Parent capability(s) this extends. Present for extensions, absent for root capabilities. Use array for multi-parent extensions."
+        }
+      },
+      "required": [
+        "version",
+        "spec",
+        "schema"
+      ]
+    },
+    "business_schema": {
+      "title": "Capability (Business Schema)",
+      "description": "Capability declaration for business/merchant discovery. Requires the `schema` URL so platforms can fetch and compose it during negotiation; may also include business-specific config overrides.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "extends": {
+          "oneOf": [
+            {
+              "$ref": "common/types/reverse_domain_name.json"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "common/types/reverse_domain_name.json"
+              },
+              "minItems": 1
+            }
+          ],
+          "description": "Parent capability(s) this extends. Present for extensions, absent for root capabilities. Use array for multi-parent extensions."
+        }
+      },
+      "required": [
+        "version",
+        "schema"
+      ]
+    },
+    "response_schema": {
+      "title": "Capability (Response Schema)",
+      "description": "Capability reference in responses. Only name/version required to confirm active capabilities.",
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Entity version in YYYY-MM-DD format."
+        },
+        "spec": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to human-readable specification document."
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to JSON Schema defining this entity's structure and payloads."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this entity instance. Used to disambiguate when multiple instances exist."
+        },
+        "config": {
+          "type": "object",
+          "description": "Entity-specific configuration. Structure defined by each entity's schema.",
+          "additionalProperties": true
+        },
+        "extends": {
+          "oneOf": [
+            {
+              "$ref": "common/types/reverse_domain_name.json"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "common/types/reverse_domain_name.json"
+              },
+              "minItems": 1
+            }
+          ],
+          "description": "Parent capability(s) this extends. Present for extensions, absent for root capabilities. Use array for multi-parent extensions."
+        }
+      },
+      "required": [
+        "version"
+      ]
+    }
+  }
+}

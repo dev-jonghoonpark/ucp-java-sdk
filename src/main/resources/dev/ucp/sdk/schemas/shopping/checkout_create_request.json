@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "dev.ucp.shopping.checkout",
+  "title": "Checkout Create Request",
+  "description": "Base checkout schema. Extensions compose onto this using allOf.",
+  "type": "object",
+  "required": [
+    "line_items"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "line_items": {
+      "type": "array",
+      "items": {
+        "$ref": "types/line_item_create_request.json"
+      },
+      "description": "List of line items being checked out."
+    },
+    "buyer": {
+      "$ref": "types/buyer_create_request.json",
+      "description": "Representation of the buyer."
+    },
+    "context": {
+      "$ref": "../common/types/context_create_request.json"
+    },
+    "signals": {
+      "$ref": "../common/types/signals_create_request.json"
+    },
+    "attribution": {
+      "$ref": "types/attribution_create_request.json"
+    },
+    "payment": {
+      "$ref": "../common/types/payment_create_request.json"
+    }
+  }
+}

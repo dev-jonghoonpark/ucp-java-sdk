@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "dev.ucp.shopping.checkout",
+  "title": "Checkout Complete Request",
+  "description": "Base checkout schema. Extensions compose onto this using allOf.",
+  "type": "object",
+  "required": [
+    "payment"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "signals": {
+      "$ref": "../common/types/signals_complete_request.json"
+    },
+    "attribution": {
+      "$ref": "types/attribution_complete_request.json"
+    },
+    "payment": {
+      "$ref": "../common/types/payment_complete_request.json"
+    }
+  }
+}

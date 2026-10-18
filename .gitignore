@@ -1,0 +1,7 @@
+target/
+.ucp/
+.claude/
+.idea/
+*.iml
+.vscode/
+.DS_Store
