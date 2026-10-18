@@ -22,6 +22,13 @@
   <b>Java library for the Universal Commerce Protocol (UCP).</b>
 </p>
 
+> [!IMPORTANT]
+> **This is an unofficial, community-maintained SDK.** It is not affiliated
+> with, maintained by, or endorsed by the UCP project. The official SDKs are
+> [Python](https://github.com/Universal-Commerce-Protocol/python-sdk) and
+> [JavaScript](https://github.com/Universal-Commerce-Protocol/js-sdk); this
+> project follows their approach for Java.
+
 ## Overview
 
 This repository contains a Java SDK for the
@@ -62,18 +69,37 @@ The version is also available at runtime as `UcpModels.SCHEMA_VERSION`.
 
 Requires Java 17 or later.
 
+> [!NOTE]
+> **Not published yet.** The SDK is not on Maven Central or any other
+> repository, so the dependency below will not resolve. To use it today, build
+> it from source and install it into your local Maven repository:
+>
+> ```bash
+> git clone https://github.com/dev-jonghoonpark/ucp-java-sdk.git
+> cd ucp-java-sdk
+> ./gradlew publishToMavenLocal
+> ```
+>
+> Then add `mavenLocal()` to your repositories (Gradle); Maven reads the local
+> repository automatically.
+
+Once a release is published, adding the dependency will look like this. The
+coordinates are provisional and may change before the first release.
+
+Gradle:
+
+```kotlin
+implementation("dev.ucp:ucp-sdk:0.5.0-SNAPSHOT")
+```
+
+Maven:
+
 ```xml
 <dependency>
   <groupId>dev.ucp</groupId>
   <artifactId>ucp-sdk</artifactId>
   <version>0.5.0-SNAPSHOT</version>
 </dependency>
-```
-
-Gradle:
-
-```kotlin
-implementation("dev.ucp:ucp-sdk:0.5.0-SNAPSHOT")
 ```
 
 ## Usage
