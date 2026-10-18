@@ -44,9 +44,9 @@ public interface EmbeddedMessage {
 
         public Deserializer() {
             super(EmbeddedMessage.class, List.of(
-                    variant(EmbeddedMessage.Request.class, List.of("jsonrpc", "method", "params"), Map.of("jsonrpc", "2.0")),
-                    variant(EmbeddedMessage.Response.class, List.of("jsonrpc", "id", "result"), Map.of("jsonrpc", "2.0")),
-                    variant(Jsonrpc.ErrorResponse.class, List.of("jsonrpc", "id", "error"), Map.of("jsonrpc", "2.0"))));
+                    variant(EmbeddedMessage.Request.class, List.of("jsonrpc", "method", "params"), Map.ofEntries(Map.entry("jsonrpc", "2.0"))),
+                    variant(EmbeddedMessage.Response.class, List.of("jsonrpc", "id", "result"), Map.ofEntries(Map.entry("jsonrpc", "2.0"))),
+                    variant(Jsonrpc.ErrorResponse.class, List.of("jsonrpc", "id", "error"), Map.ofEntries(Map.entry("jsonrpc", "2.0")))));
         }
     }
 

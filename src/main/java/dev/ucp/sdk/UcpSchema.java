@@ -23,9 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Records which UCP JSON Schema a generated model was generated from, so that
- * {@link dev.ucp.sdk.validation.UcpSchemaValidator#validate(Object)} can validate an instance
- * against it.
+ * Records which UCP JSON Schema a generated model was generated from, so that {@link
+ * dev.ucp.sdk.validation.UcpSchemaValidator#validate(Object)} can validate an instance against it.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -20,7 +20,6 @@ package dev.ucp.sdk.models.common.types;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -275,7 +274,13 @@ public class MessageError implements Message {
             return value;
         }
 
-        @JsonCreator
+        /**
+         * Returns the constant for a wire value.
+         *
+         * @param value the wire value
+         * @return the constant
+         * @throws IllegalArgumentException if the value is not defined
+         */
         public static ContentType fromValue(String value) {
             for (ContentType v : values()) {
                 if (v.value.equals(value)) {
@@ -311,7 +316,13 @@ public class MessageError implements Message {
             return value;
         }
 
-        @JsonCreator
+        /**
+         * Returns the constant for a wire value.
+         *
+         * @param value the wire value
+         * @return the constant
+         * @throws IllegalArgumentException if the value is not defined
+         */
         public static Severity fromValue(String value) {
             for (Severity v : values()) {
                 if (v.value.equals(value)) {

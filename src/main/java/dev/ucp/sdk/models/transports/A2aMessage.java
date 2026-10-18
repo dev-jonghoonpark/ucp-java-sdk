@@ -20,7 +20,6 @@ package dev.ucp.sdk.models.transports;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,9 +50,9 @@ public interface A2aMessage {
 
         public Deserializer() {
             super(A2aMessage.class, List.of(
-                    variant(A2aMessage.AgentCard.class, List.of("extensions"), Map.of()),
-                    variant(A2aMessage.MessageRequest.class, List.of("jsonrpc", "method", "params"), Map.of("jsonrpc", "2.0", "method", "message/send")),
-                    variant(A2aMessage.MessageResponse.class, List.of("jsonrpc", "id", "result"), Map.of("jsonrpc", "2.0"))));
+                    variant(A2aMessage.AgentCard.class, List.of("extensions"), Map.ofEntries()),
+                    variant(A2aMessage.MessageRequest.class, List.of("jsonrpc", "method", "params"), Map.ofEntries(Map.entry("jsonrpc", "2.0"), Map.entry("method", "message/send"))),
+                    variant(A2aMessage.MessageResponse.class, List.of("jsonrpc", "id", "result"), Map.ofEntries(Map.entry("jsonrpc", "2.0")))));
         }
     }
 
@@ -608,7 +607,13 @@ public interface A2aMessage {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Role fromValue(String value) {
                 for (Role v : values()) {
                     if (v.value.equals(value)) {

@@ -20,7 +20,6 @@ package dev.ucp.sdk.models;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -299,7 +298,13 @@ public final class Service {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Transport fromValue(String value) {
                 for (Transport v : values()) {
                     if (v.value.equals(value)) {
@@ -582,7 +587,13 @@ public final class Service {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Transport fromValue(String value) {
                 for (Transport v : values()) {
                     if (v.value.equals(value)) {
@@ -863,7 +874,13 @@ public final class Service {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Transport fromValue(String value) {
                 for (Transport v : values()) {
                     if (v.value.equals(value)) {
@@ -1144,7 +1161,13 @@ public final class Service {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Transport fromValue(String value) {
                 for (Transport v : values()) {
                     if (v.value.equals(value)) {

@@ -74,4 +74,4 @@ echo "Exporting specification examples for the test suite..."
 python3 codegen/export_examples.py "$WORK_DIR" "$SCHEMA_DIR" src/test/resources/examples.json
 
 rm -rf "$WORK_DIR"
-echo "Done. Run 'mvn verify' to compile and test."
+echo "Done. Run './gradlew build' to compile and test."

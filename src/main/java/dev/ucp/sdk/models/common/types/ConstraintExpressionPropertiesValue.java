@@ -36,8 +36,8 @@ public interface ConstraintExpressionPropertiesValue {
 
         public Deserializer() {
             super(ConstraintExpressionPropertiesValue.class, List.of(
-                    variant(ConstraintExpression.class, List.of(), Map.of()),
-                    variant(ConstraintExpression.ValueConstraint.class, List.of(), Map.of())));
+                    variant(ConstraintExpression.class, List.of(), Map.ofEntries()),
+                    variant(ConstraintExpression.ValueConstraint.class, List.of(), Map.ofEntries())));
         }
     }
 }

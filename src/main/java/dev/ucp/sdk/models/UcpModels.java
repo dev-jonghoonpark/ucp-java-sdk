@@ -28,6 +28,7 @@ import java.util.Optional;
  * fragment, e.g. {@code shopping/checkout.json} or {@code
  * shopping/catalog_search.json#/$defs/search_request}.
  */
+@SuppressWarnings("deprecation") // the index also lists models the schemas deprecate
 public final class UcpModels {
     /** The UCP specification release these models were generated from. */
     public static final String SCHEMA_VERSION = "2026-08-25";

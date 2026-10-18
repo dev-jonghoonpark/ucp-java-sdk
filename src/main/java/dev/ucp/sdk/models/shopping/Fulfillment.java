@@ -20,7 +20,6 @@ package dev.ucp.sdk.models.shopping;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -6314,7 +6313,13 @@ public final class Fulfillment {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {

@@ -19,10 +19,12 @@ package dev.ucp.sdk;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import dev.ucp.sdk.json.UcpJson;
 import dev.ucp.sdk.models.Ucp;
 import dev.ucp.sdk.models.UcpModels;
@@ -40,15 +42,18 @@ import dev.ucp.sdk.models.shopping.types.ShippingDestination;
 import dev.ucp.sdk.validation.UcpSchemaValidator;
 import dev.ucp.sdk.validation.UcpValidationException;
 import dev.ucp.sdk.validation.ValidationResult;
+
+import org.junit.jupiter.api.Test;
+
 import java.io.UncheckedIOException;
 import java.time.OffsetDateTime;
 import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class ModelsTest {
     private static final UcpSchemaValidator VALIDATOR = UcpSchemaValidator.getDefault();
 
-    private static final String CHECKOUT = """
+    private static final String CHECKOUT =
+            """
             {
               "ucp": {
                 "version": "2026-08-25",
@@ -115,11 +120,13 @@ class ModelsTest {
     @Test
     void unionRejectsClosedVariantWhenInputHasUndeclaredProperties() {
         // ConstraintExpression is closed and has no "enum"; ValueConstraint declares it.
-        ConstraintExpression constraint = UcpJson.parse(
-                "{\"properties\": {\"brand\": {\"enum\": [\"visa\", \"mastercard\"]}}}",
-                ConstraintExpression.class);
+        ConstraintExpression constraint =
+                UcpJson.parse(
+                        "{\"properties\": {\"brand\": {\"enum\": [\"visa\", \"mastercard\"]}}}",
+                        ConstraintExpression.class);
 
-        assertInstanceOf(ConstraintExpression.ValueConstraint.class,
+        assertInstanceOf(
+                ConstraintExpression.ValueConstraint.class,
                 constraint.getProperties().get("brand"));
     }
 
@@ -153,16 +160,20 @@ class ModelsTest {
         ValidationResult result = VALIDATOR.validate(checkout);
 
         assertFalse(result.isValid());
-        assertTrue(result.errors().stream().anyMatch(e -> e.instancePath().equals("$.totals")),
+        assertTrue(
+                result.errors().stream().anyMatch(e -> e.instancePath().equals("$.totals")),
                 () -> result.errors().toString());
     }
 
     @Test
     void buildsCreateRequestFluently() {
-        CheckoutCreateRequest request = new CheckoutCreateRequest()
-                .lineItems(List.of(new LineItemCreateRequest()
-                        .item(new ItemCreateRequest().id("sku_1"))
-                        .quantity(2L)));
+        CheckoutCreateRequest request =
+                new CheckoutCreateRequest()
+                        .lineItems(
+                                List.of(
+                                        new LineItemCreateRequest()
+                                                .item(new ItemCreateRequest().id("sku_1"))
+                                                .quantity(2L)));
 
         assertEquals(
                 "{\"line_items\":[{\"item\":{\"id\":\"sku_1\"},\"quantity\":2}]}",
@@ -172,10 +183,13 @@ class ModelsTest {
 
     @Test
     void invalidRequestReportsPathAndKeyword() {
-        CheckoutCreateRequest request = new CheckoutCreateRequest()
-                .lineItems(List.of(new LineItemCreateRequest()
-                        .item(new ItemCreateRequest().id("sku_1"))
-                        .quantity(0L)));
+        CheckoutCreateRequest request =
+                new CheckoutCreateRequest()
+                        .lineItems(
+                                List.of(
+                                        new LineItemCreateRequest()
+                                                .item(new ItemCreateRequest().id("sku_1"))
+                                                .quantity(0L)));
 
         ValidationResult result = VALIDATOR.validate(request);
 
@@ -193,16 +207,22 @@ class ModelsTest {
         assertFalse(missingLineItems.isValid());
         assertEquals("required", missingLineItems.errors().get(0).keyword());
 
-        assertTrue(VALIDATOR.validate(CatalogSearch.SearchRequest.class,
-                "{\"query\": \"running shoes\"}").isValid());
+        assertTrue(
+                VALIDATOR
+                        .validate(
+                                CatalogSearch.SearchRequest.class, "{\"query\": \"running shoes\"}")
+                        .isValid());
     }
 
     @Test
     void openSchemasConvertToTheirConcreteShape() {
-        FulfillmentDestination destination = UcpJson.parse("""
+        FulfillmentDestination destination =
+                UcpJson.parse(
+                        """
                 {"type": "shipping_address", "id": "dest_1",
                  "street_address": "1600 Amphitheatre Pkwy", "address_country": "US"}
-                """, FulfillmentDestination.class);
+                """,
+                        FulfillmentDestination.class);
 
         ShippingDestination shipping = UcpJson.convert(destination, ShippingDestination.class);
 
@@ -213,15 +233,62 @@ class ModelsTest {
     @Test
     void registryFindsModelsBySchemaLocation() {
         assertEquals(Checkout.class, UcpModels.forSchema("shopping/checkout.json").orElseThrow());
-        assertEquals(Ucp.ResponseCheckoutSchema.class,
+        assertEquals(
+                Ucp.ResponseCheckoutSchema.class,
                 UcpModels.forSchema("ucp.json#/$defs/response_checkout_schema").orElseThrow());
-        assertEquals("shopping/catalog_search.json#/$defs/search_request",
+        assertEquals(
+                "shopping/catalog_search.json#/$defs/search_request",
                 UcpSchemaValidator.schemaOf(CatalogSearch.SearchRequest.class));
     }
 
     @Test
     void unknownEnumValueFailsParsing() {
-        assertThrows(UncheckedIOException.class, () -> UcpJson.parse(
-                CHECKOUT.replace("\"incomplete\"", "\"bogus\""), Checkout.class));
+        assertThrows(
+                UncheckedIOException.class,
+                () ->
+                        UcpJson.parse(
+                                CHECKOUT.replace("\"incomplete\"", "\"bogus\""), Checkout.class));
+    }
+
+    @Test
+    void lenientParsingKeepsUnknownEnumValues() {
+        String json =
+                CHECKOUT.replace("\"incomplete\"", "\"awaiting_approval\"")
+                        .replace("\"recoverable\"", "\"retry_later\"");
+
+        Checkout checkout = UcpJson.parseLenient(json, Checkout.class);
+
+        assertNull(checkout.getStatus());
+        assertEquals("awaiting_approval", checkout.getAdditionalProperties().get("status"));
+        // Also inside a union variant, which is read from a buffered tree.
+        MessageError error = assertInstanceOf(MessageError.class, checkout.getMessages().get(0));
+        assertNull(error.getSeverity());
+        assertEquals("retry_later", error.getAdditionalProperties().get("severity"));
+
+        JsonNode written = UcpJson.toTree(checkout);
+        assertEquals("awaiting_approval", written.get("status").asText());
+        assertEquals("retry_later", written.get("messages").get(0).get("severity").asText());
+        assertFalse(VALIDATOR.validate(checkout).isValid(), "unknown values are still reported");
+    }
+
+    @Test
+    void parseFromTreeReportsMismatchLikeParseFromText() {
+        JsonNode tree = UcpJson.mapper().createObjectNode().put("quantity", "two");
+
+        assertThrows(
+                UncheckedIOException.class, () -> UcpJson.parse(tree, LineItemCreateRequest.class));
+    }
+
+    @Test
+    void unknownSchemaLocationIsRejectedClearly() {
+        IllegalArgumentException typo =
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> VALIDATOR.validate("shopping/chekout.json", "{}"));
+        assertTrue(typo.getMessage().contains("Unknown UCP schema: shopping/chekout.json"));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> VALIDATOR.validate("../../META-INF/MANIFEST.MF", "{}"));
     }
 }

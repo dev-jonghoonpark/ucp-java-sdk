@@ -38,9 +38,9 @@ public interface Message {
 
         public Deserializer() {
             super(Message.class, List.of(
-                    variant(MessageError.class, List.of("type", "code", "content", "severity"), Map.of("type", "error")),
-                    variant(MessageWarning.class, List.of("type", "code", "content"), Map.of("type", "warning")),
-                    variant(MessageInfo.class, List.of("type", "content"), Map.of("type", "info"))));
+                    variant(MessageError.class, List.of("type", "code", "content", "severity"), Map.ofEntries(Map.entry("type", "error"))),
+                    variant(MessageWarning.class, List.of("type", "code", "content"), Map.ofEntries(Map.entry("type", "warning"))),
+                    variant(MessageInfo.class, List.of("type", "content"), Map.ofEntries(Map.entry("type", "info")))));
         }
     }
 }

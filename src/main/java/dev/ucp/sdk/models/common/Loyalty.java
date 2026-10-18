@@ -20,7 +20,6 @@ package dev.ucp.sdk.models.common;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -1319,8 +1318,8 @@ public final class Loyalty {
 
             public Deserializer() {
                 super(Lookup.class, List.of(
-                        variant(Loyalty.Lookup.LookupResponse.class, List.of("ucp", "products"), Map.of()),
-                        variant(Loyalty.Lookup.GetProductResponse.class, List.of("ucp", "product"), Map.of())));
+                        variant(Loyalty.Lookup.LookupResponse.class, List.of("ucp", "products"), Map.ofEntries()),
+                        variant(Loyalty.Lookup.GetProductResponse.class, List.of("ucp", "product"), Map.ofEntries())));
             }
         }
 
@@ -3287,7 +3286,13 @@ public final class Loyalty {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {

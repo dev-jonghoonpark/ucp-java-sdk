@@ -48,9 +48,9 @@ public interface Jsonrpc {
 
         public Deserializer() {
             super(Jsonrpc.class, List.of(
-                    variant(Jsonrpc.Request.class, List.of("jsonrpc", "method"), Map.of("jsonrpc", "2.0")),
-                    variant(Jsonrpc.SuccessResponse.class, List.of("jsonrpc", "id", "result"), Map.of("jsonrpc", "2.0")),
-                    variant(Jsonrpc.ErrorResponse.class, List.of("jsonrpc", "id", "error"), Map.of("jsonrpc", "2.0"))));
+                    variant(Jsonrpc.Request.class, List.of("jsonrpc", "method"), Map.ofEntries(Map.entry("jsonrpc", "2.0"))),
+                    variant(Jsonrpc.SuccessResponse.class, List.of("jsonrpc", "id", "result"), Map.ofEntries(Map.entry("jsonrpc", "2.0"))),
+                    variant(Jsonrpc.ErrorResponse.class, List.of("jsonrpc", "id", "error"), Map.ofEntries(Map.entry("jsonrpc", "2.0")))));
         }
     }
 

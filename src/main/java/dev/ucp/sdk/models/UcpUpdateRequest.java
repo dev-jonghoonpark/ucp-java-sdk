@@ -20,7 +20,6 @@ package dev.ucp.sdk.models;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,13 +50,13 @@ public interface UcpUpdateRequest {
 
         public Deserializer() {
             super(UcpUpdateRequest.class, List.of(
-                    variant(UcpUpdateRequest.PlatformSchema.class, List.of("version", "services", "payment_handlers"), Map.of()),
-                    variant(UcpUpdateRequest.BusinessSchema.class, List.of("version", "services", "payment_handlers"), Map.of()),
-                    variant(UcpUpdateRequest.ResponseCheckoutSchema.class, List.of("version", "payment_handlers"), Map.of()),
-                    variant(UcpUpdateRequest.ResponseOrderSchema.class, List.of("version"), Map.of()),
-                    variant(UcpUpdateRequest.ResponseCartSchema.class, List.of("version"), Map.of()),
-                    variant(UcpUpdateRequest.ResponseCatalogSchema.class, List.of("version"), Map.of()),
-                    variant(UcpUpdateRequest.ResponseLocationSchema.class, List.of("version"), Map.of())));
+                    variant(UcpUpdateRequest.PlatformSchema.class, List.of("version", "services", "payment_handlers"), Map.ofEntries()),
+                    variant(UcpUpdateRequest.BusinessSchema.class, List.of("version", "services", "payment_handlers"), Map.ofEntries()),
+                    variant(UcpUpdateRequest.ResponseCheckoutSchema.class, List.of("version", "payment_handlers"), Map.ofEntries()),
+                    variant(UcpUpdateRequest.ResponseOrderSchema.class, List.of("version"), Map.ofEntries()),
+                    variant(UcpUpdateRequest.ResponseCartSchema.class, List.of("version"), Map.ofEntries()),
+                    variant(UcpUpdateRequest.ResponseCatalogSchema.class, List.of("version"), Map.ofEntries()),
+                    variant(UcpUpdateRequest.ResponseLocationSchema.class, List.of("version"), Map.ofEntries())));
         }
     }
 
@@ -813,7 +812,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -1065,7 +1070,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -1317,7 +1328,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -1574,7 +1591,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -1858,7 +1881,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -2113,7 +2142,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -2366,7 +2401,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -2619,7 +2660,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -2872,7 +2919,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {
@@ -3125,7 +3178,13 @@ public interface UcpUpdateRequest {
                 return value;
             }
 
-            @JsonCreator
+            /**
+             * Returns the constant for a wire value.
+             *
+             * @param value the wire value
+             * @return the constant
+             * @throws IllegalArgumentException if the value is not defined
+             */
             public static Status fromValue(String value) {
                 for (Status v : values()) {
                     if (v.value.equals(value)) {

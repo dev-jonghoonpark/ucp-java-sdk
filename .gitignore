@@ -1,7 +1,9 @@
-target/
 .ucp/
 .claude/
 .idea/
 *.iml
 .vscode/
 .DS_Store
+.gradle/
+build/
+__pycache__/

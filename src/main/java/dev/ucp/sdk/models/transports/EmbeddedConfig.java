@@ -20,7 +20,6 @@ package dev.ucp.sdk.models.transports;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -152,7 +151,13 @@ public class EmbeddedConfig {
             return value;
         }
 
-        @JsonCreator
+        /**
+         * Returns the constant for a wire value.
+         *
+         * @param value the wire value
+         * @return the constant
+         * @throws IllegalArgumentException if the value is not defined
+         */
         public static ColorSchemeItem fromValue(String value) {
             for (ColorSchemeItem v : values()) {
                 if (v.value.equals(value)) {

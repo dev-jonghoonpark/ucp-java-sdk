@@ -25,8 +25,10 @@ import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaValidatorsConfig;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+
 import dev.ucp.sdk.UcpSchema;
 import dev.ucp.sdk.json.UcpJson;
+
 import java.io.UncheckedIOException;
 import java.util.Comparator;
 import java.util.List;
@@ -56,7 +58,8 @@ public final class UcpSchemaValidator {
     /** Base URI of the UCP schemas; {@code $id}s and locations resolve against it. */
     public static final String SCHEMA_BASE_URI = "https://ucp.dev/schemas/";
 
-    private static final String CLASSPATH_BASE = "classpath:dev/ucp/sdk/schemas/";
+    private static final String RESOURCE_BASE = "dev/ucp/sdk/schemas/";
+    private static final String CLASSPATH_BASE = "classpath:" + RESOURCE_BASE;
 
     private static final UcpSchemaValidator DEFAULT = new UcpSchemaValidator();
 
@@ -70,7 +73,9 @@ public final class UcpSchemaValidator {
                         SpecVersion.VersionFlag.V202012,
                         builder ->
                                 builder.schemaMappers(
-                                        mappers -> mappers.mapPrefix(SCHEMA_BASE_URI, CLASSPATH_BASE)));
+                                        mappers ->
+                                                mappers.mapPrefix(
+                                                        SCHEMA_BASE_URI, CLASSPATH_BASE)));
         this.config =
                 SchemaValidatorsConfig.builder()
                         .pathType(PathType.JSON_PATH)
@@ -116,6 +121,7 @@ public final class UcpSchemaValidator {
      *     JSON pointer fragment, e.g. {@code shopping/checkout.json}
      * @param json the JSON text
      * @return the validation result
+     * @throws IllegalArgumentException if {@code schema} is not a schema bundled with the SDK
      */
     public ValidationResult validate(String schema, String json) {
         try {
@@ -132,6 +138,7 @@ public final class UcpSchemaValidator {
      *     JSON pointer fragment
      * @param json the JSON tree
      * @return the validation result
+     * @throws IllegalArgumentException if {@code schema} is not a schema bundled with the SDK
      */
     public ValidationResult validate(String schema, JsonNode json) {
         Set<ValidationMessage> messages = load(schema).validate(json);
@@ -167,6 +174,11 @@ public final class UcpSchemaValidator {
     }
 
     private JsonSchema load(String schema) {
+        JsonSchema cached = cache.get(schema);
+        if (cached != null) {
+            return cached;
+        }
+        checkBundled(schema);
         return cache.computeIfAbsent(
                 schema,
                 s -> {
@@ -175,5 +187,27 @@ public final class UcpSchemaValidator {
                     loaded.initializeValidators();
                     return loaded;
                 });
+    }
+
+    /** Rejects locations that do not name a schema bundled with the SDK. */
+    private static void checkBundled(String schema) {
+        String path = schema.split("#", 2)[0];
+        boolean bundled =
+                path.endsWith(".json")
+                        && !path.startsWith("/")
+                        && !path.contains("..")
+                        && !path.contains("\\")
+                        && UcpSchemaValidator.class
+                                        .getClassLoader()
+                                        .getResource(RESOURCE_BASE + path)
+                                != null;
+        if (!bundled) {
+            throw new IllegalArgumentException(
+                    "Unknown UCP schema: "
+                            + schema
+                            + " (expected a path such as shopping/checkout.json, relative to "
+                            + SCHEMA_BASE_URI
+                            + ")");
+        }
     }
 }

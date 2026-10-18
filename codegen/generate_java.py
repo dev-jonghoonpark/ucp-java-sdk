@@ -125,8 +125,6 @@ def constant(value):
         out = "EMPTY"
     if out[0].isdigit():
         out = "_" + out
-    if out.lower() in JAVA_KEYWORDS:
-        out += "_"
     return out
 
 
@@ -533,6 +531,21 @@ class Generator:
         self.by_loc[loc.key] = d
         return d
 
+    def unique_top_name(self, package, wanted):
+        """Returns a top-level name free in package.
+
+        Checks every file-root type the package will contain (known up front
+        from the schema files), not only those generated so far.
+        """
+        taken = {t.name for t in self.tops if t.package == package}
+        taken |= {pascal(Path(f).stem) for f in self.s.docs
+                  if self.package_for(f) == package}
+        name, i = wanted, 2
+        while name in taken:
+            name = f"{wanted}{i}"
+            i += 1
+        return name
+
     def top_for_file(self, file):
         loc = Loc(file, "", self.s.docs[file])
         if loc.key in self.by_loc:
@@ -706,7 +719,7 @@ class Generator:
             p = p.parent
         if any(id(v) in ancestors for v in variants):
             d.parent.children.remove(d)
-            d.name = "".join(d.path())
+            d.name = self.unique_top_name(d.package, "".join(d.path()))
             d.parent = None
             self.tops.append(d)
         return JType(decl=d)
@@ -916,8 +929,7 @@ class Renderer:
         return out
 
     def render_enum(self, d, indent):
-        self.imports |= {"com.fasterxml.jackson.annotation.JsonCreator",
-                         "com.fasterxml.jackson.annotation.JsonValue"}
+        self.imports |= {"com.fasterxml.jackson.annotation.JsonValue"}
         pad = " " * indent
         out = javadoc(d.description, indent)
         out += f"{pad}public enum {d.name} {{\n"
@@ -933,7 +945,13 @@ class Renderer:
         out += f"{pad}    private final String value;\n\n"
         out += f"{pad}    {d.name}(String value) {{\n{pad}        this.value = value;\n{pad}    }}\n\n"
         out += f"{pad}    @JsonValue\n{pad}    public String value() {{\n{pad}        return value;\n{pad}    }}\n\n"
-        out += f"{pad}    @JsonCreator\n{pad}    public static {d.name} fromValue(String value) {{\n"
+        # No @JsonCreator: Jackson maps values through @JsonValue, which keeps
+        # READ_UNKNOWN_ENUM_VALUES_AS_NULL and problem handlers working (see
+        # UcpJson.newLenientObjectMapper).
+        out += f"{pad}    /**\n{pad}     * Returns the constant for a wire value.\n{pad}     *\n"
+        out += f"{pad}     * @param value the wire value\n{pad}     * @return the constant\n"
+        out += f"{pad}     * @throws IllegalArgumentException if the value is not defined\n{pad}     */\n"
+        out += f"{pad}    public static {d.name} fromValue(String value) {{\n"
         out += f"{pad}        for ({d.name} v : values()) {{\n"
         out += f"{pad}            if (v.value.equals(value)) {{\n{pad}                return v;\n{pad}            }}\n{pad}        }}\n"
         out += f"{pad}        throw new IllegalArgumentException(\"Unknown {d.name} value: \" + value);\n{pad}    }}\n\n"
@@ -961,9 +979,10 @@ class Renderer:
             req = [p.json_name for p in v.props if p.required]
             consts = [(p.json_name, p.const) for p in v.props if p.const is not None]
             req_s = ", ".join(java_string(r) for r in req)
-            const_s = ", ".join(f"{java_string(k)}, {java_string(c)}" for k, c in consts)
+            const_s = ", ".join(
+                f"Map.entry({java_string(k)}, {java_string(c)})" for k, c in consts)
             rows.append(f"{pad}                    variant({self.ref(JType(decl=v))}.class, "
-                        f"List.of({req_s}), Map.of({const_s}))")
+                        f"List.of({req_s}), Map.ofEntries({const_s}))")
         out += ",\n".join(rows) + "));\n"
         out += f"{pad}        }}\n{pad}    }}\n"
         out += self.children(d, indent + 4)
@@ -1072,8 +1091,12 @@ def main():
     gen.run()
     out_root = Path(out_root)
     count = 0
+    written = set()
     for top in gen.tops:
         path = out_root / top.package.replace(".", "/") / f"{top.name}.java"
+        if path in written:
+            raise SystemExit(f"two top-level types map to {path}")
+        written.add(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(Renderer(top, gen.tops, gen.s.docs).render(), encoding="utf-8")
         count += 1
@@ -1102,6 +1125,7 @@ import java.util.Optional;
  * fragment, e.g. {{@code shopping/checkout.json}} or {{@code
  * shopping/catalog_search.json#/$defs/search_request}}.
  */
+@SuppressWarnings("deprecation") // the index also lists models the schemas deprecate
 public final class UcpModels {{
     /** The UCP specification release these models were generated from. */
     public static final String SCHEMA_VERSION = {java_string(schema_version)};
@@ -1132,6 +1156,7 @@ public final class UcpModels {{
 }}
 """
     path = out_root / base_package.replace(".", "/") / "UcpModels.java"
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(body, encoding="utf-8")
 
 

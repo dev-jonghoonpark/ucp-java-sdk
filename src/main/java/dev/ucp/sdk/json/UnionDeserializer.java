@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,13 +38,12 @@ import java.util.Set;
  * <p>A variant is ruled out when the input contradicts it: a constant-valued property
  * (discriminator such as {@code "type": "error"}) holds another value, a required property is
  * missing, or the variant is closed ({@code additionalProperties: false}) and the input carries a
- * property it does not declare. Among the remaining variants the best fit wins: first the one
- * that matched more discriminators, then the one that declares more of the input's properties,
- * then the one with more required properties; ties go to the variant declared first, mirroring
- * schema order.
+ * property it does not declare. Among the remaining variants the best fit wins: first the one that
+ * matched more discriminators, then the one that declares more of the input's properties, then the
+ * one with more required properties; ties go to the variant declared first, mirroring schema order.
  *
- * <p>Generated union interfaces subclass this with their variant table; it is not meant to be
- * used directly.
+ * <p>Generated union interfaces subclass this with their variant table; it is not meant to be used
+ * directly.
  *
  * @param <T> the union interface
  */
@@ -70,7 +71,13 @@ public abstract class UnionDeserializer<T> extends StdDeserializer<T> {
         return new Variant(type, List.copyOf(required), Map.copyOf(constants));
     }
 
-    /** A union member: its class plus the schema facts used to recognise it. */
+    /**
+     * A union member: its class plus the schema facts used to recognise it.
+     *
+     * @param type the concrete class to deserialize into
+     * @param required properties the variant's schema requires
+     * @param constants property values the variant's schema pins with {@code const}
+     */
     public record Variant(Class<?> type, List<String> required, Map<String, String> constants) {}
 
     /** Properties a variant class declares, and whether it accepts undeclared ones. */
@@ -78,7 +85,13 @@ public abstract class UnionDeserializer<T> extends StdDeserializer<T> {
 
     @Override
     public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        JsonNode node = ctxt.readTree(p);
+        // Buffer the value once: inspect it as a tree to pick the variant, then replay the tokens
+        // into the variant.
+        TokenBuffer buffer = ctxt.bufferAsCopyOfValue(p);
+        JsonNode node;
+        try (JsonParser tree = buffer.asParserOnFirstToken()) {
+            node = ctxt.readTree(tree);
+        }
         Variant chosen = select(node, shapes(ctxt));
         if (chosen == null) {
             return ctxt.reportInputMismatch(
@@ -87,9 +100,18 @@ public abstract class UnionDeserializer<T> extends StdDeserializer<T> {
                     handledType().getSimpleName(),
                     variants.stream().map(v -> v.type().getSimpleName()).toList());
         }
-        @SuppressWarnings("unchecked")
-        T value = (T) ctxt.readTreeAsValue(node, chosen.type());
-        return value;
+        // Read through the codec (the ObjectMapper or ObjectReader in use) rather than ctxt: that
+        // gives the replay its own context whose parser is the replay, which problem handlers
+        // such as UcpJson's lenient enum handling inspect.
+        try (JsonParser replay = buffer.asParserOnFirstToken()) {
+            @SuppressWarnings("unchecked")
+            T value =
+                    (T)
+                            (p.getCodec() != null
+                                    ? p.getCodec().readValue(replay, chosen.type())
+                                    : ctxt.readValue(replay, chosen.type()));
+            return value;
+        }
     }
 
     private Map<Class<?>, Shape> shapes(DeserializationContext ctxt) {
@@ -97,8 +119,7 @@ public abstract class UnionDeserializer<T> extends StdDeserializer<T> {
         if (result == null) {
             Map<Class<?>, Shape> built = new HashMap<>();
             for (Variant v : variants) {
-                BeanDescription bean =
-                        ctxt.getConfig().introspect(ctxt.constructType(v.type()));
+                BeanDescription bean = ctxt.getConfig().introspect(ctxt.constructType(v.type()));
                 Set<String> names = new HashSet<>();
                 for (BeanPropertyDefinition prop : bean.findProperties()) {
                     names.add(prop.getName());

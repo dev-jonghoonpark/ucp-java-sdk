@@ -137,6 +137,19 @@ if (!result.isValid()) {
 validator.validate("shopping/checkout_create_request.json", body).orThrow();
 ```
 
+### Unknown enum values
+
+Like the Python and JavaScript SDKs, parsing fails on an enum value the schema
+does not define. To accept values a peer on a newer UCP release may send, parse
+leniently: the field reads as `null` and the raw value is kept in
+`getAdditionalProperties()`, so it is written back unchanged and the validator
+still reports it.
+
+```java
+Checkout checkout = UcpJson.parseLenient(body, Checkout.class);
+// or: ObjectMapper mapper = UcpJson.newLenientObjectMapper();
+```
+
 ### Jackson integration
 
 `UcpJson.mapper()` is the shared, preconfigured `ObjectMapper` (Java time
@@ -165,7 +178,8 @@ location.
 
 ### Prerequisites
 
-Java 17+, Maven, Python 3.10+ (standard library only) and git.
+Java 17+ (the build itself runs on JDK 21+; CI uses JDK 25), Python 3.10+ (standard library
+only) and git. Gradle is provided by the wrapper (`./gradlew`).
 
 ### Generating models
 
@@ -192,13 +206,18 @@ The pipeline:
 ### Running tests
 
 ```bash
-mvn verify
+./gradlew spotlessCheck                        # formatting (./gradlew spotlessApply to fix)
+./gradlew test                                 # unit tests
+./gradlew integrationTest                      # every generated model and spec example
+./gradlew build                                # all of the above, plus jars and Javadoc
+python3 -m unittest discover -s codegen/tests  # code generator
 ```
 
-Besides unit tests, the suite runs every documentation example of the pinned
-UCP release through the SDK: each must map to a model, survive a
+The integration tests (`*IT`) run every documentation example of the pinned
+UCP release through the SDK — each must map to a model, survive a
 parse/serialize round trip unchanged, and validate against the bundled
-schemas.
+schemas — and check the contract of every generated type. Generated models are
+excluded from Spotless; the CI model-drift job keeps them in sync instead.
 
 ## License
 

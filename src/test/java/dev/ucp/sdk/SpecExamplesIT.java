@@ -23,10 +23,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import dev.ucp.sdk.json.UcpJson;
 import dev.ucp.sdk.models.UcpModels;
 import dev.ucp.sdk.validation.UcpSchemaValidator;
 import dev.ucp.sdk.validation.ValidationError;
+
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.OffsetDateTime;
@@ -36,36 +41,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
 
 /**
  * Runs every annotated JSON example from the UCP specification docs through the SDK.
  *
- * <p>The corpus ({@code examples.json}) is exported by {@code codegen/export_examples.py} with
- * the specification's own example reducer, so it tracks the docs of the pinned UCP release.
+ * <p>The corpus ({@code examples.json}) is exported by {@code codegen/export_examples.py} with the
+ * specification's own example reducer, so it tracks the docs of the pinned UCP release.
  */
-class SpecExamplesTest {
+class SpecExamplesIT {
     private static final UcpSchemaValidator VALIDATOR = UcpSchemaValidator.getDefault();
 
     /**
      * One documentation example.
      *
-     * @param exact false when a request example is checked against the response schema because
-     *     the schema defines no request variant; the response schema can require more
+     * @param exact false when a request example is checked against the response schema because the
+     *     schema defines no request variant; the response schema can require more
      */
     record Example(
             String source, String schema, boolean exact, List<String> elided, JsonNode payload) {}
 
     static List<Example> examples() throws IOException {
-        try (InputStream in = SpecExamplesTest.class.getResourceAsStream("/examples.json")) {
+        try (InputStream in = SpecExamplesIT.class.getResourceAsStream("/examples.json")) {
             JsonNode root = UcpJson.mapper().readTree(Objects.requireNonNull(in));
             List<Example> out = new ArrayList<>();
             for (JsonNode e : root) {
                 List<String> elided = new ArrayList<>();
                 e.get("elided").forEach(p -> elided.add(p.asText()));
-                out.add(new Example(e.get("source").asText(), e.get("schema").asText(),
-                        e.get("exact").asBoolean(), elided, e.get("payload")));
+                out.add(
+                        new Example(
+                                e.get("source").asText(),
+                                e.get("schema").asText(),
+                                e.get("exact").asBoolean(),
+                                elided,
+                                e.get("payload")));
             }
             return out;
         }
@@ -74,52 +82,90 @@ class SpecExamplesTest {
     @TestFactory
     Stream<DynamicTest> everyExampleHasAModel() throws IOException {
         return examples().stream()
-                .map(e -> DynamicTest.dynamicTest(e.source() + " " + e.schema(), () ->
-                        assertTrue(UcpModels.forSchema(e.schema()).isPresent(),
-                                "no model generated for " + e.schema())));
+                .map(
+                        e ->
+                                DynamicTest.dynamicTest(
+                                        e.source() + " " + e.schema(),
+                                        () ->
+                                                assertTrue(
+                                                        UcpModels.forSchema(e.schema()).isPresent(),
+                                                        "no model generated for " + e.schema())));
     }
 
     @TestFactory
     Stream<DynamicTest> examplesRoundTripThroughModels() throws IOException {
         return examples().stream()
-                .map(e -> DynamicTest.dynamicTest(e.source() + " " + e.schema(), () -> {
-                    Class<?> type = UcpModels.forSchema(e.schema()).orElseThrow();
-                    Object model = UcpJson.parse(e.payload(), type);
-                    assertEquals(type, model.getClass());
-                    JsonNode written = UcpJson.toTree(model);
-                    String diff = diff("$", e.payload(), written);
-                    if (diff != null) {
-                        fail("round trip changed the payload at " + diff
-                                + "\nexpected: " + e.payload() + "\nactual:   " + written);
-                    }
-                }));
+                .map(
+                        e ->
+                                DynamicTest.dynamicTest(
+                                        e.source() + " " + e.schema(),
+                                        () -> {
+                                            Class<?> type =
+                                                    UcpModels.forSchema(e.schema()).orElseThrow();
+                                            Object model = UcpJson.parse(e.payload(), type);
+                                            assertEquals(type, model.getClass());
+                                            JsonNode written = UcpJson.toTree(model);
+                                            String diff = diff("$", e.payload(), written);
+                                            if (diff != null) {
+                                                fail(
+                                                        "round trip changed the payload at "
+                                                                + diff
+                                                                + "\nexpected: "
+                                                                + e.payload()
+                                                                + "\nactual:   "
+                                                                + written);
+                                            }
+                                        }));
     }
 
     @TestFactory
     Stream<DynamicTest> examplesValidateAgainstBundledSchemas() throws IOException {
         return examples().stream()
                 .filter(Example::exact)
-                .map(e -> DynamicTest.dynamicTest(e.source() + " " + e.schema(), () -> {
-                    List<ValidationError> errors = VALIDATOR.validate(e.schema(), e.payload())
-                            .errors().stream()
-                            .filter(err -> !isElided(toPointer(err.instancePath()), e.elided()))
-                            .toList();
-                    if (!errors.isEmpty()) {
-                        fail(errors.size() + " violation(s): " + errors);
-                    }
-                }));
+                .map(
+                        e ->
+                                DynamicTest.dynamicTest(
+                                        e.source() + " " + e.schema(),
+                                        () -> {
+                                            List<ValidationError> errors =
+                                                    VALIDATOR
+                                                            .validate(e.schema(), e.payload())
+                                                            .errors()
+                                                            .stream()
+                                                            .filter(
+                                                                    err ->
+                                                                            !isElided(
+                                                                                    toPointer(
+                                                                                            err
+                                                                                                    .instancePath()),
+                                                                                    e.elided()))
+                                                            .toList();
+                                            if (!errors.isEmpty()) {
+                                                fail(errors.size() + " violation(s): " + errors);
+                                            }
+                                        }));
     }
 
     @TestFactory
     Stream<DynamicTest> modelsValidateAfterRoundTrip() throws IOException {
         return examples().stream()
                 .filter(e -> e.exact() && e.elided().isEmpty())
-                .map(e -> DynamicTest.dynamicTest(e.source() + " " + e.schema(), () -> {
-                    Object model = UcpJson.parse(
-                            e.payload(), UcpModels.forSchema(e.schema()).orElseThrow());
-                    List<ValidationError> errors = VALIDATOR.validate(model).errors();
-                    assertTrue(errors.isEmpty(), () -> "violations: " + errors);
-                }));
+                .map(
+                        e ->
+                                DynamicTest.dynamicTest(
+                                        e.source() + " " + e.schema(),
+                                        () -> {
+                                            Object model =
+                                                    UcpJson.parse(
+                                                            e.payload(),
+                                                            UcpModels.forSchema(e.schema())
+                                                                    .orElseThrow());
+                                            List<ValidationError> errors =
+                                                    VALIDATOR.validate(model).errors();
+                                            assertTrue(
+                                                    errors.isEmpty(),
+                                                    () -> "violations: " + errors);
+                                        }));
     }
 
     private static boolean isElided(String pointer, List<String> elided) {
@@ -134,7 +180,8 @@ class SpecExamplesTest {
             char c = jsonPath.charAt(i);
             if (c == '.') {
                 int j = i + 1;
-                while (j < jsonPath.length() && jsonPath.charAt(j) != '.'
+                while (j < jsonPath.length()
+                        && jsonPath.charAt(j) != '.'
                         && jsonPath.charAt(j) != '[') {
                     j++;
                 }
@@ -160,9 +207,9 @@ class SpecExamplesTest {
     }
 
     /**
-     * Compares JSON trees, treating numerically equal numbers and equal instants as the same
-     * (a {@code Double} field writes {@code 5} back as {@code 5.0}; an {@code OffsetDateTime}
-     * drops redundant fractional zeros).
+     * Compares JSON trees, treating numerically equal numbers and equal instants as the same (a
+     * {@code Double} field writes {@code 5} back as {@code 5.0}; an {@code OffsetDateTime} drops
+     * redundant fractional zeros).
      *
      * @return the path of the first difference, or {@code null} if equivalent
      */
@@ -176,7 +223,9 @@ class SpecExamplesTest {
             }
             try {
                 return OffsetDateTime.parse(expected.asText())
-                        .isEqual(OffsetDateTime.parse(actual.asText())) ? null : path;
+                                .isEqual(OffsetDateTime.parse(actual.asText()))
+                        ? null
+                        : path;
             } catch (DateTimeParseException e) {
                 return path;
             }
